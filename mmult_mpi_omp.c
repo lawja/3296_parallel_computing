@@ -49,8 +49,9 @@ int main(int argc, char* argv[])
         {
             MPI_Send(&offset, 1, MPI_INT, dest, 1, MPI_COMM_WORLD);
             MPI_Send(&rows, 1, MPI_INT, dest, 1, MPI_COMM_WORLD);
-            MPI_Send(&aa[offset][0], rows*ncols, MPI_DOUBLE,dest,1, MPI_COMM_WORLD);
+            MPI_Send(&aa[offset], rows*ncols, MPI_DOUBLE,dest,1, MPI_COMM_WORLD);
             MPI_Send(&bb, nrows*ncols, MPI_DOUBLE, dest, 1, MPI_COMM_WORLD);
+            MPI_Send(&cc1, nrows*ncols, MPI_DOUBLE, dest, 1, MPI_COMM_WORLD);
             offset = offset + rows;
         }
 
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
             source = i;
             MPI_Recv(&offset, 1, MPI_INT, source, 2, MPI_COMM_WORLD, &status);
             MPI_Recv(&rows, 1, MPI_INT, source, 2, MPI_COMM_WORLD, &status);
-            MPI_Recv(&cc1[offset][0], rows*nrows, MPI_DOUBLE, source, 2, MPI_COMM_WORLD, &status);
+            MPI_Recv(&cc1[offset], rows*nrows, MPI_DOUBLE, source, 2, MPI_COMM_WORLD, &status);
         }
 
 
@@ -75,7 +76,7 @@ int main(int argc, char* argv[])
         MPI_Recv(&rows, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &status);
         MPI_Recv(&aa, rows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
         MPI_Recv(&bb, nrows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
-
+        MPI_Recv(&cc1, nrows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
         /* Matrix multiplication */
         for (k=0; k<ncols; k++)
             for (i=0; i<rows; i++) {
