@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
         {
             MPI_Send(&offset, 1, MPI_INT, dest, 1, MPI_COMM_WORLD);
             MPI_Send(&rows, 1, MPI_INT, dest, 1, MPI_COMM_WORLD);
-            MPI_Send(&aa[offset], rows*ncols, MPI_DOUBLE,dest,1, MPI_COMM_WORLD);
-            MPI_Send(&bb, nrows*ncols, MPI_DOUBLE, dest, 1, MPI_COMM_WORLD);
-            MPI_Send(&cc1, nrows*ncols, MPI_DOUBLE, dest, 1, MPI_COMM_WORLD);
+            MPI_Send(aa[offset], rows*ncols, MPI_DOUBLE,dest,1, MPI_COMM_WORLD);
+            MPI_Send(bb, nrows*ncols, MPI_DOUBLE, dest, 1, MPI_COMM_WORLD);
+            MPI_Send(cc1, nrows*ncols, MPI_DOUBLE, dest, 1, MPI_COMM_WORLD);
             offset = offset + rows;
         }
 
