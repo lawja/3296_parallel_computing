@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
             source = i;
             MPI_Recv(&offset, 1, MPI_INT, source, 2, MPI_COMM_WORLD, &status);
             MPI_Recv(&rows, 1, MPI_INT, source, 2, MPI_COMM_WORLD, &status);
-            MPI_Recv(&c[offset][0], rows*nrows, MPI_DOUBLE, source, 2, MPI_COMM_WORLD, &status);
+            MPI_Recv(&cc1[offset][0], rows*nrows, MPI_DOUBLE, source, 2, MPI_COMM_WORLD, &status);
         }
 
 
@@ -81,13 +81,13 @@ int main(int argc, char* argv[])
             for (i=0; i<rows; i++) {
                 cc1[i][k] = 0.0;
                 for (j=0; j<ncols; j++)
-                    cc1[i][k] = c[i][k] + a[i][j] * b[j][k];
+                    cc1[i][k] = cc1[i][k] + aa[i][j] * bb[j][k];
             }
 
 
         MPI_Send(&offset, 1, MPI_INT, 0, 2, MPI_COMM_WORLD);
         MPI_Send(&rows, 1, MPI_INT, 0, 2, MPI_COMM_WORLD);
-        MPI_Send(&c, rows*ncols, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD);
+        MPI_Send(&cc1, rows*ncols, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD);
     }
   } else {
     fprintf(stderr, "Usage matrix_times_vector <size>\n");
