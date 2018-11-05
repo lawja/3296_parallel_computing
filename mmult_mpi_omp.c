@@ -9,7 +9,7 @@ double* gen_matrix(int n, int m);
 int mmult(double *c, double *a, int aRows, int aCols, double *b, int bRows, int bCols);
 void compare_matrix(double *a, double *b, int nRows, int nCols);
 void printMatrix(double* a, int rows, int cols);
-double* getCol(double* b, n, col);
+double* getCol(double* b, int n, int col);
 
 /** 
     Program to multiply a matrix times a matrix using both
@@ -105,7 +105,7 @@ void printMatrix(double *a, int rows, int cols){
     }
 }
 
-double* getCol(double* b, n, col)
+double* getCol(double* b, int n, int col)
 {
   ret[1][n]
   for(int i = 0; i < n; i++)
