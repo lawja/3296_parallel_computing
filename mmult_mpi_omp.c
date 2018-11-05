@@ -105,12 +105,12 @@ void printMatrix(double *a, int rows, int cols){
     }
 }
 
-double* getCol(double* b, int n, int col)
+double* getCol(double *b, int n, int col)
 {
   double ret[1][n];
   for(int i = 0; i < n; i++)
   {
-    ret[0][i] = b[col][i];
+    ret[0][i] = b[i*n+col];
   }
-  return ret;
+  return &ret;
 }
