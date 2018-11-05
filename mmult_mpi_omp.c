@@ -115,6 +115,7 @@ int main(int argc, char* argv[])
                     token = strtok(line, s);
                     t_count = 0;
                     while(token != NULL){
+                        //printf("token: %s :: %d     ", token, ((line_count-2)*cols_1)+t_count);
                         aa[((line_count-2)*cols_1) + t_count++] = atof(token);
                         token = strtok(NULL, s);
                     }
@@ -175,12 +176,15 @@ int main(int argc, char* argv[])
             exit(1);
         }/*
         if(myid == 0){
+            printf("rows1: %d\tcols_1:%d", rows_1, cols_1); 
+            printf("rows2: %d\tcols_2:%d", rows_2, cols_2);
+            printf("aa:");
+            printMatrix(aa, rows_1, cols_1);
+            printf("bb:");
+            printMatrix(bb, rows_2, cols_2);
             
-            
-            //printMatrix(aa, rows_1, cols_1);
-            //printMatrix(bb, rows_2, cols_2);
-        }
-*/
+        }*/
+
         nrows = rows_1;
         ncols = cols_1;
 
@@ -253,8 +257,8 @@ int main(int argc, char* argv[])
       for(i = 1; i < numprocs; i++){
           MPI_Recv(&offset, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
           MPI_Recv(&(temp_cc[arows*offset]), 2*arows*bcols, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-          printf("returned cc:\n");
-          printMatrix(temp_cc, arows, bcols);
+          //printf("returned cc:\n");
+          //printMatrix(temp_cc, arows, bcols);
       }
       cc1 = temp_cc;
       /* Insert your master code here to store the product into cc1 */
