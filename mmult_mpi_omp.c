@@ -27,6 +27,7 @@ int main(int argc, char* argv[])
   double starttime, endtime;
   MPI_Status status;
   /* insert other global variables here */
+  int offset;
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
@@ -35,6 +36,7 @@ int main(int argc, char* argv[])
     ncols = nrows;
     if (myid == 0) {
       // Master Code goes here
+      offset = 0
       aa = gen_matrix(nrows, ncols);
       bb = gen_matrix(ncols, nrows);
       cc1 = malloc(sizeof(double) * nrows * nrows); 
@@ -57,6 +59,8 @@ int main(int argc, char* argv[])
           //MPI_Send(&b, M_SIZE * M_SIZE, MPI_INT, i, 0, MPI_COMM_WORLD);
           MPI_Send(&(aa[0]), 2*nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
           //MPI_Send(&(aa[5]), 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+          MPI_Send(&(bb[1]), 2*nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
+          offset++;
       }
      
       /* Insert your master code here to store the product into cc1 */
