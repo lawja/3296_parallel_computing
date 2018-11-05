@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     ncols = nrows;
     if (myid == 0) {
       // Master Code goes here
-      offset = 0
+      offset = 0;
       aa = gen_matrix(nrows, ncols);
       bb = gen_matrix(ncols, nrows);
       cc1 = malloc(sizeof(double) * nrows * nrows); 
