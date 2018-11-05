@@ -35,7 +35,7 @@ double* gen_matrix(int n, int m) {
 void compare_matrices(double* a, double* b, int nRows, int nCols) {
 	int n = nRows * nCols;
 	int i, j, k;
-  /*      
+        /*
         printf("\n\n");
 	printf("#############\n");
         printf("a");
@@ -44,7 +44,7 @@ void compare_matrices(double* a, double* b, int nRows, int nCols) {
         printMatrix_(b, nRows, nCols);
         printf("\n#############\n");
         printf("\n\n");
-*/        
+        */
 	for (k = 0; k < n; ++k) {
 		if (fabs(a[k]-b[k])/fabs(a[k]) > 1e-12) {
 			i = k/nCols;

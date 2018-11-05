@@ -1,6 +1,7 @@
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <sys/times.h>
 #define min(x, y) ((x)<(y)?(x):(y))
@@ -9,6 +10,7 @@ double* gen_matrix(int n, int m);
 int mmult(double *c, double *a, int aRows, int aCols, double *b, int bRows, int bCols);
 void compare_matrix(double *a, double *b, int nRows, int nCols);
 void printMatrix(double* a, int rows, int cols);
+void writeMatrix(double* a, int rows, int cols);
 
 /** 
     Program to multiply a matrix times a matrix using both
@@ -18,6 +20,10 @@ void printMatrix(double* a, int rows, int cols);
 
 int main(int argc, char* argv[])
 {
+  char *source_file_1;
+  char *source_file_2;
+  FILE *sf1;
+  FILE *sf2;
   int nrows, ncols;
   double *aa;	/* the A matrix */
   double *bb;	/* the B matrix */
@@ -32,13 +38,165 @@ int main(int argc, char* argv[])
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+  //printf("%d", argc);
   if (argc > 1) {
-    nrows = atoi(argv[1]);
-    ncols = nrows;
+    // if file names are passed
+    if(argc > 2){
+        source_file_1 = argv[1];
+        source_file_2 = argv[2];
+        
+        sf1 = fopen(source_file_1, "r");
+        if(sf1 == NULL){
+            printf("unable to open %s\n", source_file_1);
+            return 1;
+        }
+        sf2 = fopen(source_file_2, "r");
+        if(sf2 == NULL){
+            printf("unable to open %s\n", source_file_2);
+            return 1;
+        }
+        
+        int max_line = 2048 * 5;
+        
+        char *lineBuffer = (char *) malloc(max_line);
+        
+        
+        char *line = NULL;
+        size_t len = 0;
+        ssize_t read;
+        int c;
+        int line_count = 0;
+        char *p1, *p2, *p3, *p4;
+        char *row_str_1, *col_str_1, row_str_2, *col_str_2;
+        row_str_1 = (char *) malloc(8);
+        col_str_1 = (char *) malloc(8);
+        row_str_2 = (char *) malloc(8);
+        col_str_2 = (char *) malloc(8);
+        char s[2] = " ";
+        char *token;
+        int rows_1, cols_1, rows_2, cols_2;
+        int t_count;
+
+        while((read = getline(&line, &len, sf1))!=-1){
+            if(line_count++ == 0){
+               p1 = strstr(line, "rows(");
+               if(p1){
+                   p2 = strstr(p1, ")c");
+                   if(p2){
+                       sprintf(row_str_1, "%.*s", p2-p1-5, p1+5);
+                       p3 = strstr(line, "cols(");
+                       if(p3){
+                           p4 = strstr(p3, ")");
+                           if(p4){
+                               sprintf(col_str_1, "%.*s", p4-p3-5, p3+5);
+                               rows_1 = atof(row_str_1);
+                               cols_1 = atof(col_str_1);
+                           }else{
+                               printf("unable to parse matrix dimensions for %s\n", source_file_1);
+                               exit(1);
+                           }
+                       }else{
+                           printf("unable to parse matrix dimensions for %s\n", source_file_1);
+                           exit(1);
+                       }
+                   }else{
+                       printf("unable to parse matrix dimensions for %s\n", source_file_1);
+                       exit(1);
+                   }
+               }else{
+                   printf("unable to parse matrix dimensions for %s\n", source_file_1);
+                   exit(1);
+               }
+            }else{
+                if(myid == 0){
+                    if(line_count == 2){
+                        aa = malloc(sizeof(double)*rows_1*cols_1);
+                    }
+                    token = strtok(line, s);
+                    t_count = 0;
+                    while(token != NULL){
+                        aa[((line_count-2)*cols_1) + t_count++] = atof(token);
+                        token = strtok(NULL, s);
+                    }
+                }
+            }
+        }
+        char *token_;
+        line_count = 0;
+        len = 0;
+        char *p5, *p6, *p7, *p8;
+        while((read = getline(&line, &len, sf2))!=-1){
+            if(line_count++ == 0){
+               p5 = strstr(line, "rows(");
+               if(p5){
+                   p6 = strstr(p5, ")c");
+                   if(p6){
+                       sprintf(row_str_1, "%.*s", p6-p5-5, p5+5);
+                       p7 = strstr(line, "cols(");
+                       if(p7){
+                           p8 = strstr(p7, ")");
+                           if(p8){
+                               sprintf(col_str_1, "%.*s", p8-p7-5, p7+5);
+                               rows_2 = atof(row_str_1);
+                               cols_2 = atof(col_str_1);
+                           }else{
+                               printf("unable to parse matrix dimensions for %s\n", source_file_2);
+                               exit(1);
+                           }
+                       }else{
+                           printf("unable to parse matrix dimensions for %s\n", source_file_2);
+                           exit(1);
+                       }
+                   }else{
+                       printf("unable to parse matrix dimensions for %s\n", source_file_2);
+                       exit(1);
+                   }
+               }else{
+                   printf("unable to parse matrix dimensions for %s\n", source_file_2);
+                   exit(1);
+               }
+            }else{
+                if(myid == 0){
+                    if(line_count == 2){
+                        bb = malloc(sizeof(double)*rows_2*cols_2);
+                    }
+                    token_ = strtok(line, s);
+                    t_count = 0;
+                    while(token_ != NULL){
+                        bb[((line_count-2)*cols_2) + t_count++] = atof(token_);
+                        token_ = strtok(NULL, s);
+                    }
+                }
+            }
+        }
+        if(myid == 0){
+            if(cols_1 != rows_2){
+                printf("matrix dimensions do not comply with multplication requirements\n");
+                printf("A: %dx%d\tB: %dx%d", rows_1, cols_1, rows_2, cols_2);
+            }
+            
+            //printMatrix(aa, rows_1, cols_1);
+            //printMatrix(bb, rows_2, cols_2);
+        }
+
+        nrows = rows_1;
+        ncols = cols_1;
+    
+        fclose(sf1);
+        fclose(sf2);
+
+        free(lineBuffer);
+    }else{
+        nrows = atoi(argv[1]);
+        ncols = nrows;
+    }
     if (myid == 0) {
       // Master Code goes here
-      aa = gen_matrix(nrows, ncols);
-      bb = gen_matrix(ncols, nrows);
+      if(argc == 2){
+          //printf("generating\n");
+          aa = gen_matrix(nrows, ncols);
+          bb = gen_matrix(ncols, nrows);
+      }
       cc1 = malloc(sizeof(double) * nrows * nrows); 
   /*    
       printf("############\n");
@@ -93,6 +251,8 @@ int main(int argc, char* argv[])
       cc2  = malloc(sizeof(double) * nrows * nrows);
       mmult(cc2, aa, nrows, ncols, bb, ncols, nrows);
       compare_matrices(cc2, cc1, nrows, nrows);
+      writeMatrix(cc2, nrows, ncols);
+      printf("resulting matix written to out.txt\n");
     } else {
       bb = malloc(sizeof(double) * nrows * ncols);
      
@@ -149,4 +309,18 @@ void printMatrix(double *a, int rows, int cols){
         }
         printf("\n");
     }
+}
+
+void writeMatrix(double *a, int rows, int cols){
+    FILE *f = fopen("out.txt", "w");
+    int i, j;
+    fprintf(f, "rows(%d)cols(%d)\n", rows, cols);
+    for(i = 0; i < rows; i++){
+        for(j = 0; j < cols; j++){
+            fprintf(f, "%lf ", a[i*rows + j]);
+        }
+        fprintf(f, "\n");
+    }
+    //fprintf(f, "\0");
+    fclose(f);
 }
