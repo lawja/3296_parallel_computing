@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
           MPI_Send(&(aa[0]), 2*nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
           //MPI_Send(&(aa[5]), 1, MPI_INT, i, 0, MPI_COMM_WORLD);
           MPI_Send(&offset, sizeof(int)*offset, MPI_INT, i,  0, MPI_COMM_WORLD);
-          double *temp = getCol(bb, nrows, offset)
+          double *temp = getCol(&bb, nrows, offset)
           MPI_Send(&(temp[0]), 2*nrows, MPI_INT, i, 0, MPI_COMM_WORLD);
           offset++;
       }
@@ -110,7 +110,7 @@ double* getCol(double* b, int n, int col)
   double ret[1][n];
   for(int i = 0; i < n; i++)
   {
-    ret[1][i] = b[col][i]
+    ret[0][i] = b[col][i];
   }
   return ret;
 }
