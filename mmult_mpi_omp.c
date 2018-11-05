@@ -9,6 +9,7 @@ double* gen_matrix(int n, int m);
 int mmult(double *c, double *a, int aRows, int aCols, double *b, int bRows, int bCols);
 void compare_matrix(double *a, double *b, int nRows, int nCols);
 void printMatrix(double* a, int rows, int cols);
+double* getCol(double* b, n, col);
 
 /** 
     Program to multiply a matrix times a matrix using both
@@ -59,7 +60,9 @@ int main(int argc, char* argv[])
           //MPI_Send(&b, M_SIZE * M_SIZE, MPI_INT, i, 0, MPI_COMM_WORLD);
           MPI_Send(&(aa[0]), 2*nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
           //MPI_Send(&(aa[5]), 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-          MPI_Send(&(bb[1]), 2*nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
+          MPI_Send(&offset, sizeof(int)*offset, MPI_INT, i,  0, MPI_COMM_WORLD);
+          double *temp = getCol(bb, nrows, offset)
+          MPI_Send(&(temp[0]), 2*nrows, MPI_INT, i, 0, MPI_COMM_WORLD);
           offset++;
       }
      
@@ -70,14 +73,17 @@ int main(int argc, char* argv[])
       mmult(cc2, aa, nrows, ncols, bb, ncols, nrows);
       compare_matrices(cc2, cc1, nrows, nrows);
     } else {
+      double temp[1][ncols];
       aa = malloc(sizeof(double) * nrows * ncols);
       //MPI_Recv(&b, M_SIZE * M_SIZE, MPI_INT, MASTER_RANK, message_tag, MPI_COMM_WORLD, &status);
       MPI_Recv(&(aa[0]), 2*nrows*ncols, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       //MPI_Recv(&(aa[5]), 1, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-      
+      MPI_Recv(&pffset, sizeof(int)*offset, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+      MPI_Recv(&(temp), 2*nrows, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       printf("\npassed aa:%d\n", myid);
       printf("%lf", aa[5]);
       printMatrix(aa, nrows, ncols);
+      printMatrix(temp, nrows, offset)
 
       printf("\n\n%d done\n\n", myid);
     }
@@ -97,4 +103,14 @@ void printMatrix(double *a, int rows, int cols){
         }
         printf("\n");
     }
+}
+
+double* getCol(double* b, n, col)
+{
+  ret[1][n]
+  for(int i = 0; i < n; i++)
+  {
+    ret[1][i] = b[col][i]
+  }
+  return ret;
 }
