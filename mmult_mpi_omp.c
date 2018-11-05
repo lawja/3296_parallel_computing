@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
   char *source_file_2;
   FILE *sf1;
   FILE *sf2;
-  int nrows, ncols;
+  int nrows, ncols, arows, acols, brows, bcols;
   double *aa;	/* the A matrix */
   double *bb;	/* the B matrix */
   double *cc1;	/* A x B computed using the omp-mpi code you write */
@@ -181,7 +181,12 @@ int main(int argc, char* argv[])
 
         nrows = rows_1;
         ncols = cols_1;
-    
+
+        arows = rows_1;
+        acols = cols_1;
+        brows = rows_2;
+        bcols = cols_2;
+        
         fclose(sf1);
         fclose(sf2);
 
@@ -189,6 +194,11 @@ int main(int argc, char* argv[])
     }else{
         nrows = atoi(argv[1]);
         ncols = nrows;
+        
+        arows = nrows;
+        acols = ncols;
+        brows = nrows;
+        bcols = ncols;
     }
     if (myid == 0) {
       // Master Code goes here
@@ -197,7 +207,7 @@ int main(int argc, char* argv[])
           aa = gen_matrix(nrows, ncols);
           bb = gen_matrix(ncols, nrows);
       }
-      cc1 = malloc(sizeof(double) * nrows * nrows); 
+      cc1 = malloc(sizeof(double) * arows * bcols); 
   /*    
       printf("############\n");
       printf("aa\n");
@@ -209,8 +219,8 @@ int main(int argc, char* argv[])
       starttime = MPI_Wtime();
       
       
-      rows_per = nrows / (numprocs-1);
-      remainder_rows = nrows / (numprocs-1);
+      rows_per = arows / (numprocs-1);
+      remainder_rows = arows / (numprocs-1);
       offset = 0;
 /*
       printf("### numprocs: %d\n", numprocs);
@@ -223,24 +233,24 @@ int main(int argc, char* argv[])
           //printf("aa[5] = %lf\n", aa[5]);
           //printf("sending to %d\n", i);
           //MPI_Send(&b, M_SIZE * M_SIZE, MPI_INT, i, 0, MPI_COMM_WORLD);
-          MPI_Send(&(bb[0]), 2*nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
+          MPI_Send(&(bb[0]), 2*brows*bcols, MPI_INT, i, 0, MPI_COMM_WORLD);
           MPI_Send(&offset, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
           if(i == numprocs-1)
               rows_per += remainder_rows;
           MPI_Send(&rows_per, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
 
-          for(j = 0; j < nrows*rows_per; j++){
-              MPI_Send(&(aa[offset*ncols + j]), 2, MPI_INT, i, 0, MPI_COMM_WORLD);
+          for(j = 0; j < arows*rows_per; j++){
+              MPI_Send(&(aa[offset*acols + j]), 2, MPI_INT, i, 0, MPI_COMM_WORLD);
           }
-          MPI_Send(&(bb[offset*nrows]), 2*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
+          MPI_Send(&(bb[offset*brows]), 2*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
           //MPI_Send(&(aa[5]), 1, MPI_INT, i, 0, MPI_COMM_WORLD);
           offset+=rows_per;
       }
       //return 1;
-      temp_cc = malloc(sizeof(double)*2 * nrows*nrows);
+      temp_cc = malloc(sizeof(double)*2 * arows*bcols);
       for(i = 1; i < numprocs; i++){
           MPI_Recv(&offset, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
-          MPI_Recv(&(temp_cc[nrows*offset]), 2*nrows*nrows, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          MPI_Recv(&(temp_cc[arows*offset]), 2*arows*bcols, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
           //printf("returned cc:\n");
           //printMatrix(temp_cc, nrows, nrows);
       }
@@ -248,28 +258,28 @@ int main(int argc, char* argv[])
       /* Insert your master code here to store the product into cc1 */
       endtime = MPI_Wtime();
       printf("%f\n",(endtime - starttime));
-      cc2  = malloc(sizeof(double) * nrows * nrows);
-      mmult(cc2, aa, nrows, ncols, bb, ncols, nrows);
+      cc2  = malloc(sizeof(double) * arows * bcols);
+      mmult(cc2, aa, arows, acols, bb, brows, bcols);
       compare_matrices(cc2, cc1, nrows, nrows);
-      writeMatrix(cc2, nrows, ncols);
+      writeMatrix(cc2, arows, bcols);
       printf("resulting matix written to out.txt\n");
     } else {
-      bb = malloc(sizeof(double) * nrows * ncols);
+      bb = malloc(sizeof(double) * brows * bcols);
      
       //MPI_Recv(&b, M_SIZE * M_SIZE, MPI_INT, MASTER_RANK, message_tag, MPI_COMM_WORLD, &status);
-      MPI_Recv(&(bb[0]), 2*nrows*ncols, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+      MPI_Recv(&(bb[0]), 2*brows*bcols, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       MPI_Recv(&offset, 1, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       MPI_Recv(&rows_per, 1, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       
-      aa = malloc(sizeof(double) * ncols* rows_per);
-      temp_cc = malloc(sizeof(double) * nrows*nrows); 
+      aa = malloc(sizeof(double) * acols* rows_per);
+      temp_cc = malloc(sizeof(double) * arows*bcols); 
           
       int k, h;
-      for(k = 0; k < ncols*rows_per; k++){
+      for(k = 0; k < acols*rows_per; k++){
           MPI_Recv(&(aa[k]), 2, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE); 
       }
 
-      mmult(temp_cc,aa,rows_per,ncols,bb,nrows,ncols); 
+      mmult(temp_cc,aa,rows_per,acols,bb,brows,bcols); 
       MPI_Send(&offset, 1, MPI_INT, 0, 0,MPI_COMM_WORLD);
       MPI_Send(&(temp_cc[0]), 2*nrows*nrows, MPI_INT, 0, 0, MPI_COMM_WORLD);
     
