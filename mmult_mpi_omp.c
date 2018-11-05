@@ -8,6 +8,7 @@
 double* gen_matrix(int n, int m);
 int mmult(double *c, double *a, int aRows, int aCols, double *b, int bRows, int bCols);
 void compare_matrix(double *a, double *b, int nRows, int nCols);
+void printMatrix(double* a, int rows, int cols);
 
 /** 
     Program to multiply a matrix times a matrix using both
@@ -22,7 +23,7 @@ int main(int argc, char* argv[])
   double *bb;	/* the B matrix */
   double *cc1;	/* A x B computed using the omp-mpi code you write */
   double *cc2;	/* A x B computed using the conventional algorithm */
-  int myid, numprocs;
+  int myid, numprocs, number;
   double starttime, endtime;
   MPI_Status status;
   /* insert other global variables here */
@@ -37,7 +38,25 @@ int main(int argc, char* argv[])
       aa = gen_matrix(nrows, ncols);
       bb = gen_matrix(ncols, nrows);
       cc1 = malloc(sizeof(double) * nrows * nrows); 
+      /* 
+      printf("aa\n");
+      printMatrix(aa, nrows, ncols);
+      printf("bb\n");
+      printMatrix(bb, nrows, ncols);
+      */
       starttime = MPI_Wtime();
+      int i;
+      number = 69;
+      printf("### numprocs: %d\n", numprocs);
+      for(i = 1; i < numprocs; i++){
+          number *= i;
+          //printf("aa[5] = %lf\n", aa[5]);
+          printf("sending to %d\n", i);
+          //MPI_Send(&b, M_SIZE * M_SIZE, MPI_INT, i, 0, MPI_COMM_WORLD);
+          MPI_Send(&(aa[0]), nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
+          //MPI_Send(&(aa[5]), 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+      }
+     
       /* Insert your master code here to store the product into cc1 */
       endtime = MPI_Wtime();
       printf("%f\n",(endtime - starttime));
@@ -45,11 +64,31 @@ int main(int argc, char* argv[])
       mmult(cc2, aa, nrows, ncols, bb, ncols, nrows);
       compare_matrices(cc2, cc1, nrows, nrows);
     } else {
-      // Slave Code goes here
+      aa = malloc(sizeof(double) * nrows * ncols);
+      //MPI_Recv(&b, M_SIZE * M_SIZE, MPI_INT, MASTER_RANK, message_tag, MPI_COMM_WORLD, &status);
+      MPI_Recv(&(aa[0]), nrows*ncols, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+      //MPI_Recv(&(aa[5]), 1, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+      
+      printf("\npassed aa:%d\n", myid);
+      printf("%lf", aa[5]);
+      printMatrix(aa, nrows, ncols);
+
+      printf("\n\n%d done\n\n", myid);
     }
   } else {
     fprintf(stderr, "Usage matrix_times_vector <size>\n");
   }
   MPI_Finalize();
   return 0;
+}
+
+void printMatrix(double *a, int rows, int cols){
+    int i, j;
+    printf("\n");
+    for(i = 0; i < rows; i++){
+        for(j = 0; j < cols; j++){
+            printf("%lf ", a[i*rows + j]);
+        }
+        printf("\n");
+    }
 }
