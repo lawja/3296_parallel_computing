@@ -18,9 +18,11 @@ void compare_matrix(double *a, double *b, int nRows, int nCols);
 int main(int argc, char* argv[])
 {
   int nrows, ncols;
-  double *aa;	/* the A matrix */
-  double *bb;	/* the B matrix */
-  double *cc1;	/* A x B computed using the omp-mpi code you write */
+    nrows = atoi(argv[1]);
+    ncols = nrows;
+  double aa[nrows][ncols];	/* the A matrix */
+  double bb[nrows][ncols];	/* the B matrix */
+  double cc1[nrows][ncols];	/* A x B computed using the omp-mpi code you write */
   double *cc2;	/* A x B computed using the conventional algorithm */
   int myid, numprocs;
   double starttime, endtime;
@@ -33,8 +35,7 @@ int main(int argc, char* argv[])
   workers = numprocs - 1;
 
   if (argc > 1) {
-    nrows = atoi(argv[1]);
-    ncols = nrows;
+
     if (myid == 0) {
       // Master Code goes here
       aa = gen_matrix(nrows, ncols);

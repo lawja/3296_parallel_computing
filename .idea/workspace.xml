@@ -9,7 +9,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b41a985-a7c6-4df6-87ba-c8a4a12a6cb5" name="Default Changelist" comment="" />
+    <list default="true" id="0b41a985-a7c6-4df6-87ba-c8a4a12a6cb5" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/mmult_mpi_omp.c" beforeDir="false" afterPath="$PROJECT_DIR$/mmult_mpi_omp.c" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,12 +42,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="c" value="345" />
+          <entry key="c" value="353" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="ObjectiveC" value="345" />
+          <entry key="ObjectiveC" value="353" />
         </counts>
       </usages-collector>
     </session>
@@ -73,8 +75,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mmult_mpi_omp.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="82" column="22" lean-forward="true" selection-start-line="82" selection-start-column="22" selection-end-line="82" selection-end-column="22" />
+            <state relative-caret-position="255">
+              <caret line="21" column="18" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -167,12 +169,12 @@
       <option name="presentableId" value="Default" />
       <updated>1540928450480</updated>
       <workItem from="1540928452849" duration="1385000" />
-      <workItem from="1541369298632" duration="7434000" />
+      <workItem from="1541369298632" duration="7550000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="8819000" />
+    <option name="totallyTimeSpent" value="8935000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="0" width="781" height="830" extended-state="0" />
@@ -242,8 +244,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mmult_mpi_omp.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="82" column="22" lean-forward="true" selection-start-line="82" selection-start-column="22" selection-end-line="82" selection-end-column="22" />
+        <state relative-caret-position="255">
+          <caret line="21" column="18" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="18" />
         </state>
       </provider>
     </entry>
