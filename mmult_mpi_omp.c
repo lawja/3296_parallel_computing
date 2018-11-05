@@ -38,12 +38,14 @@ int main(int argc, char* argv[])
       aa = gen_matrix(nrows, ncols);
       bb = gen_matrix(ncols, nrows);
       cc1 = malloc(sizeof(double) * nrows * nrows); 
-      /* 
+      
+      printf("############\n");
       printf("aa\n");
       printMatrix(aa, nrows, ncols);
       printf("bb\n");
       printMatrix(bb, nrows, ncols);
-      */
+      printf("############\n");
+
       starttime = MPI_Wtime();
       int i;
       number = 69;
@@ -53,7 +55,7 @@ int main(int argc, char* argv[])
           //printf("aa[5] = %lf\n", aa[5]);
           printf("sending to %d\n", i);
           //MPI_Send(&b, M_SIZE * M_SIZE, MPI_INT, i, 0, MPI_COMM_WORLD);
-          MPI_Send(&(aa[0]), nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
+          MPI_Send(&(aa[0]), 2*nrows*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
           //MPI_Send(&(aa[5]), 1, MPI_INT, i, 0, MPI_COMM_WORLD);
       }
      
@@ -66,7 +68,7 @@ int main(int argc, char* argv[])
     } else {
       aa = malloc(sizeof(double) * nrows * ncols);
       //MPI_Recv(&b, M_SIZE * M_SIZE, MPI_INT, MASTER_RANK, message_tag, MPI_COMM_WORLD, &status);
-      MPI_Recv(&(aa[0]), nrows*ncols, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+      MPI_Recv(&(aa[0]), 2*nrows*ncols, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       //MPI_Recv(&(aa[5]), 1, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       
       printf("\npassed aa:%d\n", myid);
