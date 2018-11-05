@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
       mmult(cc2, aa, nrows, ncols, bb, ncols, nrows);
       compare_matrices(cc2, cc1, nrows, nrows);
     } else {
-      double temp[1][ncols];
+      double *temp;
       aa = malloc(sizeof(double) * nrows * ncols);
       //MPI_Recv(&b, M_SIZE * M_SIZE, MPI_INT, MASTER_RANK, message_tag, MPI_COMM_WORLD, &status);
       MPI_Recv(&(aa[0]), 2*nrows*ncols, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
@@ -111,6 +111,7 @@ double* getCol(double *b, int n, int col)
   for(int i = 0; i < n; i++)
   {
     ret[i] = b[i*n+col];
+    printf("%1f", ret[i]);
   }
   return &ret;
 }
