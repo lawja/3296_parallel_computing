@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
       
       rows_per = arows / (numprocs-1);
       remainder_rows = arows / (numprocs-1);
-      offset = 0;
+      offset = 0;//arows/2;
 /*
       printf("### numprocs: %d\n", numprocs);
       printf("### %d * %d\n", nrows, ncols);
@@ -254,12 +254,17 @@ int main(int argc, char* argv[])
       }
       //return 1;
       temp_cc = malloc(sizeof(double)*2 * arows*bcols);
+      //printMatrix(temp_cc, arows, bcols);
       for(i = 1; i < numprocs; i++){
+         
           MPI_Recv(&offset, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
-          MPI_Recv(&(temp_cc[arows*offset]), 2*arows*bcols, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+          printf("arows*offset: %d\n", arows*offset);
+          MPI_Recv(&(temp_cc[acols*offset]), 2*arows*bcols, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
           //printf("returned cc:\n");
           //printMatrix(temp_cc, arows, bcols);
       }
+      //mmult(temp_cc,aa,arows,acols,bb,brows,bcols); 
+      
       cc1 = temp_cc;
       /* Insert your master code here to store the product into cc1 */
       endtime = MPI_Wtime();
@@ -267,7 +272,7 @@ int main(int argc, char* argv[])
       cc2  = malloc(sizeof(double) * arows * bcols);
       mmult(cc2, aa, arows, acols, bb, brows, bcols);
       compare_matrices(cc2, cc1, arows, bcols);
-      writeMatrix(cc2, arows, bcols);
+      writeMatrix(cc1, arows, bcols);
       printf("resulting matrix written to out.txt\n");
     } else {
       bb = malloc(sizeof(double) * brows * bcols);
