@@ -169,16 +169,18 @@ int main(int argc, char* argv[])
                 }
             }
         }
+        if(cols_1 != rows_2){
+            printf("matrix dimensions do not comply with multplication requirements\n");
+            printf("A: %dx%d\tB: %dx%d", rows_1, cols_1, rows_2, cols_2);
+            exit(1);
+        }/*
         if(myid == 0){
-            if(cols_1 != rows_2){
-                printf("matrix dimensions do not comply with multplication requirements\n");
-                printf("A: %dx%d\tB: %dx%d", rows_1, cols_1, rows_2, cols_2);
-            }
+            
             
             //printMatrix(aa, rows_1, cols_1);
             //printMatrix(bb, rows_2, cols_2);
         }
-
+*/
         nrows = rows_1;
         ncols = cols_1;
 
@@ -239,7 +241,7 @@ int main(int argc, char* argv[])
               rows_per += remainder_rows;
           MPI_Send(&rows_per, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
 
-          for(j = 0; j < arows*rows_per; j++){
+          for(j = 0; j < acols*rows_per; j++){
               MPI_Send(&(aa[offset*acols + j]), 2, MPI_INT, i, 0, MPI_COMM_WORLD);
           }
           MPI_Send(&(bb[offset*brows]), 2*ncols, MPI_INT, i, 0, MPI_COMM_WORLD);
@@ -251,8 +253,8 @@ int main(int argc, char* argv[])
       for(i = 1; i < numprocs; i++){
           MPI_Recv(&offset, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
           MPI_Recv(&(temp_cc[arows*offset]), 2*arows*bcols, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-          //printf("returned cc:\n");
-          //printMatrix(temp_cc, nrows, nrows);
+          printf("returned cc:\n");
+          printMatrix(temp_cc, arows, bcols);
       }
       cc1 = temp_cc;
       /* Insert your master code here to store the product into cc1 */
@@ -260,9 +262,9 @@ int main(int argc, char* argv[])
       printf("%f\n",(endtime - starttime));
       cc2  = malloc(sizeof(double) * arows * bcols);
       mmult(cc2, aa, arows, acols, bb, brows, bcols);
-      compare_matrices(cc2, cc1, nrows, nrows);
+      compare_matrices(cc2, cc1, arows, bcols);
       writeMatrix(cc2, arows, bcols);
-      printf("resulting matix written to out.txt\n");
+      printf("resulting matrix written to out.txt\n");
     } else {
       bb = malloc(sizeof(double) * brows * bcols);
      
@@ -281,7 +283,7 @@ int main(int argc, char* argv[])
 
       mmult(temp_cc,aa,rows_per,acols,bb,brows,bcols); 
       MPI_Send(&offset, 1, MPI_INT, 0, 0,MPI_COMM_WORLD);
-      MPI_Send(&(temp_cc[0]), 2*nrows*nrows, MPI_INT, 0, 0, MPI_COMM_WORLD);
+      MPI_Send(&(temp_cc[0]), 2*arows*bcols, MPI_INT, 0, 0, MPI_COMM_WORLD);
     
       //MPI_Recv(&(aa[5]), 1, MPI_INT, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       /*
