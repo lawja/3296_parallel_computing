@@ -74,9 +74,9 @@ int main(int argc, char* argv[])
         source = 0;
         MPI_Recv(&offset, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &status);
         MPI_Recv(&rows, 1, MPI_INT, source, 1, MPI_COMM_WORLD, &status);
-        MPI_Recv(aa, rows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
-        MPI_Recv(bb, nrows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
-        MPI_Recv(cc1, nrows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&aa, rows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&bb, nrows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
+        MPI_Recv(&cc1, nrows*ncols, MPI_DOUBLE, source, 1, MPI_COMM_WORLD, &status);
         /* Matrix multiplication */
         for (k=0; k<ncols; k++)
             for (i=0; i<rows; i++) {
