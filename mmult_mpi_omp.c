@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
       printf("\npassed aa:%d\n", myid);
       printf("%lf", aa[5]);
       printMatrix(aa, nrows, ncols);
-      printMatrix(temp, nrows, offset);
+      printMatrix(temp, nrows, 1);
 
       printf("\n\n%d done\n\n", myid);
     }
@@ -107,10 +107,10 @@ void printMatrix(double *a, int rows, int cols){
 
 double* getCol(double *b, int n, int col)
 {
-  double ret[1][n];
+  double ret[n];
   for(int i = 0; i < n; i++)
   {
-    ret[0][i] = b[i*n+col];
+    ret[i] = b[i*n+col];
   }
   return &ret;
 }
